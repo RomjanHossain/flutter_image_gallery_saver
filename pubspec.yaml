@@ -21,7 +21,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.flutter_image_gallery_saver
+        package: dev.knottx.flutter_image_gallery_saver
         pluginClass: FlutterImageGallerySaverPlugin
       ios:
         pluginClass: FlutterImageGallerySaverPlugin

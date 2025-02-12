@@ -25,14 +25,7 @@ abstract class FlutterImageGallerySaverPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<void> saveImage(
-    Uint8List imageBytes, {
-    required int quality,
-    String? name,
-  });
+  Future<void> saveImage(Uint8List imageBytes);
 
-  Future<void> saveFile(
-    String filePath, {
-    String? name,
-  });
+  Future<void> saveFile(String filePath);
 }

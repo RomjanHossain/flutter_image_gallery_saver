@@ -5,7 +5,7 @@ public class FlutterImageGallerySaverPlugin: NSObject, FlutterPlugin {
   var result: FlutterResult?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "com.knottx.flutter_image_gallery_saver", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "dev.knottx.flutter_image_gallery_saver", binaryMessenger: registrar.messenger())
     let instance = FlutterImageGallerySaverPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
@@ -19,7 +19,7 @@ public class FlutterImageGallerySaverPlugin: NSObject, FlutterPlugin {
           let image = UIImage(data: imageData) { 
             saveImage(image)
         } else {
-          result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid Arguments", details: nil))
+          result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid Arguments", details: nil))
         }
 
       case "save_file":
@@ -33,7 +33,7 @@ public class FlutterImageGallerySaverPlugin: NSObject, FlutterPlugin {
               result(FlutterError(code: "INVALID_FILE", message: "Invalid File", details: nil))
             }
         } else {
-          result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid Arguments", details: nil))
+          result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid Arguments", details: nil))
         }
         
       default:
@@ -47,19 +47,13 @@ public class FlutterImageGallerySaverPlugin: NSObject, FlutterPlugin {
     return allowedExtensions.contains(ext)
   }
 
-  func isVideoFile(_ filePath: String) -> Bool {
-    let ext = (filePath as NSString).pathExtension.lowercased()
-    let allowedExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heic"]
-    return allowedExtensions.contains(ext)
-  }
-
   func saveImage(_ image: UIImage) {
     UIImageWriteToSavedPhotosAlbum(image, self, #selector(didFinishSavingImage(image:error:contextInfo:)), nil)
   }
 
   @objc func didFinishSavingImage(image: UIImage, error: NSError?, contextInfo: UnsafeMutableRawPointer?) {
     if let error = error {
-      self.result?(FlutterError(code: "UNSUCCESSFUL", message: error.localizedDescription, details: nil))
+      self.result?(FlutterError(code: "SAVE_FAILED", message: error.localizedDescription, details: nil))
     } else {
       self.result?(nil)
     }
@@ -71,7 +65,7 @@ public class FlutterImageGallerySaverPlugin: NSObject, FlutterPlugin {
 
   @objc func didFinishSavingVideo(videoPath: String, error: NSError?, contextInfo: UnsafeMutableRawPointer?) {
     if let error = error {
-      self.result?(FlutterError(code: "UNSUCCESSFUL", message: error.localizedDescription, details: nil))
+      self.result?(FlutterError(code: "SAVE_FAILED", message: error.localizedDescription, details: nil))
     } else {
       self.result?(nil)
     }

@@ -8,29 +8,19 @@ class MethodChannelFlutterImageGallerySaver
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel =
-      const MethodChannel('com.knottx.flutter_image_gallery_saver');
+      const MethodChannel('dev.knottx.flutter_image_gallery_saver');
 
   @override
-  Future<void> saveImage(
-    Uint8List imageBytes, {
-    required int quality,
-    String? name,
-  }) async {
+  Future<void> saveImage(Uint8List imageBytes) async {
     return methodChannel.invokeMethod('save_image', {
       'image_bytes': imageBytes,
-      'quality': quality,
-      'name': name,
     });
   }
 
   @override
-  Future<void> saveFile(
-    String filePath, {
-    String? name,
-  }) {
+  Future<void> saveFile(String filePath) {
     return methodChannel.invokeMethod('save_file', {
       'file_path': filePath,
-      'name': name,
     });
   }
 }
