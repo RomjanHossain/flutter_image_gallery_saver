@@ -1,6 +1,6 @@
 name: flutter_image_gallery_saver
-description: "A flutter plugin for save image to gallery."
-version: 0.0.1
+description: "Flutter Image Gallery Saver is a plugin that lets you save images and files to the device gallery on Android and iOS, streamlining media storage for your apps."
+version: 0.0.2
 homepage: https://github.com/knottx/flutter_image_gallery_saver
 repository: https://github.com/knottx/flutter_image_gallery_saver
 issue_tracker: https://github.com/knottx/flutter_image_gallery_saver/issues
