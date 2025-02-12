@@ -1,29 +1,53 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:typed_data';
+
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver_platform_interface.dart';
-import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver_method_channel.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 class MockFlutterImageGallerySaverPlatform
-    with MockPlatformInterfaceMixin
-    implements FlutterImageGallerySaverPlatform {
+    extends FlutterImageGallerySaverPlatform {
+  Uint8List? savedImageBytes;
+  String? savedFilePath;
 
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
+  Future<void> saveImage(Uint8List imageBytes) async {
+    savedImageBytes = imageBytes;
+    return Future.value();
+  }
+
+  @override
+  Future<void> saveFile(String filePath) async {
+    savedFilePath = filePath;
+    return Future.value();
+  }
 }
 
 void main() {
-  final FlutterImageGallerySaverPlatform initialPlatform = FlutterImageGallerySaverPlatform.instance;
+  group('FlutterImageGallerySaver', () {
+    late MockFlutterImageGallerySaverPlatform mockPlatform;
+    late FlutterImageGallerySaverPlatform originalPlatform;
 
-  test('$MethodChannelFlutterImageGallerySaver is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelFlutterImageGallerySaver>());
-  });
+    setUp(() {
+      mockPlatform = MockFlutterImageGallerySaverPlatform();
+      originalPlatform = FlutterImageGallerySaverPlatform.instance;
+      FlutterImageGallerySaverPlatform.instance = mockPlatform;
+    });
 
-  test('getPlatformVersion', () async {
-    FlutterImageGallerySaver flutterImageGallerySaverPlugin = FlutterImageGallerySaver();
-    MockFlutterImageGallerySaverPlatform fakePlatform = MockFlutterImageGallerySaverPlatform();
-    FlutterImageGallerySaverPlatform.instance = fakePlatform;
+    tearDown(() {
+      FlutterImageGallerySaverPlatform.instance = originalPlatform;
+    });
 
-    expect(await flutterImageGallerySaverPlugin.getPlatformVersion(), '42');
+    test('saveImage calls platform saveImage with correct image bytes',
+        () async {
+      final testBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+      await FlutterImageGallerySaver.saveImage(testBytes);
+      expect(mockPlatform.savedImageBytes, equals(testBytes));
+    });
+
+    test('saveFile calls platform saveFile with correct file path', () async {
+      final testFilePath = '/path/to/test.png';
+      await FlutterImageGallerySaver.saveFile(testFilePath);
+      expect(mockPlatform.savedFilePath, equals(testFilePath));
+    });
   });
 }

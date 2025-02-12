@@ -5,19 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  MethodChannelFlutterImageGallerySaver platform =
-      MethodChannelFlutterImageGallerySaver();
   const MethodChannel channel =
-      MethodChannel('com.knottx.flutter_image_gallery_saver');
+      MethodChannel('dev.knottx.flutter_image_gallery_saver');
+
+  late MethodChannelFlutterImageGallerySaver platform;
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      channel,
-      (MethodCall methodCall) async {
-        return '42';
-      },
-    );
+    platform = MethodChannelFlutterImageGallerySaver();
   });
 
   tearDown(() {
@@ -25,7 +19,38 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('getPlatformVersion', () async {
-    // expect(await platform.getPlatformVersion(), '42');
+  test('saveImage sends correct method call and arguments', () async {
+    final testBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+
+    late MethodCall recordedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall call) async {
+      recordedCall = call;
+
+      return null;
+    });
+
+    await platform.saveImage(testBytes);
+
+    expect(recordedCall.method, equals('save_image'));
+    expect(recordedCall.arguments, equals({'image_bytes': testBytes}));
+  });
+
+  test('saveFile sends correct method call and arguments', () async {
+    final testFilePath = '/path/to/test_image.png';
+
+    late MethodCall recordedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall call) async {
+      recordedCall = call;
+      return null;
+    });
+
+    await platform.saveFile(testFilePath);
+
+    expect(recordedCall.method, equals('save_file'));
+    expect(recordedCall.arguments, equals({'file_path': testFilePath}));
   });
 }
