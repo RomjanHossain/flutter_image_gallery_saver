@@ -4,7 +4,7 @@ version: 0.0.1
 homepage: https://github.com/knottx/flutter_image_gallery_saver
 repository: https://github.com/knottx/flutter_image_gallery_saver
 issue_tracker: https://github.com/knottx/flutter_image_gallery_saver/issues
-topics: [image saver, gallery saver, gallery, image, saver]
+topics: [gallery, image, saver]
 funding: [https://github.com/sponsors/knottx]
 
 environment:
