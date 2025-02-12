@@ -1,62 +1,123 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  runApp(
+    MaterialApp(
+      home: HomePage(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _flutterImageGallerySaverPlugin = FlutterImageGallerySaver();
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _flutterImageGallerySaverPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Image.asset('assets/images/Icon-App.png'),
+            FilledButton(
+              onPressed: saveImage,
+              child: Text('Save Image'),
+            ),
+            FilledButton(
+              onPressed: saveImageFile,
+              child: Text('Save Image File'),
+            ),
+            FilledButton(
+              onPressed: saveVideoFile,
+              child: Text('Save Video File'),
+            ),
+          ],
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+      ),
+    );
+  }
+
+  void saveImage() async {
+    try {
+      final data = await rootBundle.load('assets/images/Icon-App.png');
+      final bytes = data.buffer.asUint8List();
+
+      await FlutterImageGallerySaver.saveImage(bytes);
+
+      showSuccessSnackBar();
+    } catch (error) {
+      showFailureSnackBar(error.toString());
+    }
+  }
+
+  void saveImageFile() async {
+    try {
+      final data = await rootBundle.load('assets/images/Icon-App.png');
+      final bytes = data.buffer.asUint8List();
+
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/Icon-App.png';
+      final file = File(filePath);
+      file.writeAsBytesSync(bytes);
+
+      await FlutterImageGallerySaver.saveFile(filePath);
+
+      showSuccessSnackBar();
+    } catch (error) {
+      showFailureSnackBar(error.toString());
+    }
+  }
+
+  void saveVideoFile() async {
+    try {
+      final data = await rootBundle.load('assets/videos/bee.mp4');
+      final bytes = data.buffer.asUint8List();
+
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/bee.mp4';
+      final file = File(filePath);
+      file.writeAsBytesSync(bytes);
+
+      await FlutterImageGallerySaver.saveFile(filePath);
+
+      showSuccessSnackBar();
+    } catch (error) {
+      showFailureSnackBar(error.toString());
+    }
+  }
+
+  void showSuccessSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Success'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void showFailureSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
       ),
     );
   }

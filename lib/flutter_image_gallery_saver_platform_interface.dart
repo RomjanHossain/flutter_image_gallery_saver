@@ -1,6 +1,7 @@
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'dart:typed_data';
 
-import 'flutter_image_gallery_saver_method_channel.dart';
+import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver_method_channel.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 abstract class FlutterImageGallerySaverPlatform extends PlatformInterface {
   /// Constructs a FlutterImageGallerySaverPlatform.
@@ -8,7 +9,8 @@ abstract class FlutterImageGallerySaverPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static FlutterImageGallerySaverPlatform _instance = MethodChannelFlutterImageGallerySaver();
+  static FlutterImageGallerySaverPlatform _instance =
+      MethodChannelFlutterImageGallerySaver();
 
   /// The default instance of [FlutterImageGallerySaverPlatform] to use.
   ///
@@ -23,7 +25,14 @@ abstract class FlutterImageGallerySaverPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
+  Future<void> saveImage(
+    Uint8List imageBytes, {
+    required int quality,
+    String? name,
+  });
+
+  Future<void> saveFile(
+    String filePath, {
+    String? name,
+  });
 }
