@@ -10,13 +10,13 @@ class MockFlutterImageGallerySaverPlatform
   String? savedFilePath;
 
   @override
-  Future<void> saveImage(Uint8List imageBytes) async {
+  Future<void> saveImage(Uint8List imageBytes, String? fileName) async {
     savedImageBytes = imageBytes;
     return Future.value();
   }
 
   @override
-  Future<void> saveFile(String filePath) async {
+  Future<void> saveFile(String filePath, String? fileName) async {
     savedFilePath = filePath;
     return Future.value();
   }

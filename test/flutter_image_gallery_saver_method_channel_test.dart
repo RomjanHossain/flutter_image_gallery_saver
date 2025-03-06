@@ -32,9 +32,9 @@ void main() {
     });
 
     await platform.saveImage(testBytes);
-
     expect(recordedCall.method, equals('save_image'));
-    expect(recordedCall.arguments, equals({'image_bytes': testBytes}));
+    expect(recordedCall.arguments,
+        equals({'image_bytes': testBytes, 'file_name': null}));
   });
 
   test('saveFile sends correct method call and arguments', () async {
@@ -51,6 +51,11 @@ void main() {
     await platform.saveFile(testFilePath);
 
     expect(recordedCall.method, equals('save_file'));
-    expect(recordedCall.arguments, equals({'file_path': testFilePath}));
+    expect(
+        recordedCall.arguments,
+        equals({
+          'file_path': testFilePath,
+          'file_name': testFilePath.split('/').last
+        }));
   });
 }
