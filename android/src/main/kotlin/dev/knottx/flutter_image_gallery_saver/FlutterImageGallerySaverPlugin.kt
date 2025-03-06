@@ -20,6 +20,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.OutputStream
 
+
 class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
 
     private lateinit var channel: MethodChannel
@@ -35,6 +36,7 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
         when (call.method) {
             "save_image" -> {
                 val imageBytes = call.argument<ByteArray>("image_bytes")
+                val fileName = call.argument<String>("file_name") ?: "${System.currentTimeMillis()}"
                 if (imageBytes == null) {
                     result.error("INVALID_ARGUMENTS", "No image bytes provided", null)
                     return
@@ -45,7 +47,7 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
                     return
                 }
                 try {
-                    saveImage(bmp)
+                    saveImage(bmp, fileName)
                     result.success(null)
                 } catch (e: Exception) {
                     result.error("SAVE_FAILED", e.message, null)
@@ -53,12 +55,13 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
             }
             "save_file" -> {
                 val filePath = call.argument<String>("file_path")
+                val fileName = call.argument<String>("file_name") ?: "${System.currentTimeMillis()}"
                 if (filePath == null) {
                     result.error("INVALID_ARGUMENTS", "No file path provided", null)
                     return
                 }
                 try {
-                    saveFile(filePath)
+                    saveFile(filePath, fileName)
                     result.success(null)
                 } catch (e: Exception) {
                     result.error("SAVE_FAILED", e.message, null)
@@ -72,8 +75,8 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(null)
     }
 
-    private fun saveImage(bmp: Bitmap) {
-        val fileUri: Uri = generateUri("jpg")
+    private fun saveImage(bmp: Bitmap,  fileName: String) {
+        val fileUri: Uri = generateUri(fileName, "jpg")
             ?: throw Exception("Failed to generate file URI")
         val fos: OutputStream = applicationContext?.contentResolver?.openOutputStream(fileUri)
             ?: throw Exception("Failed to open output stream")
@@ -91,11 +94,11 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun saveFile(filePath: String) {
+    private fun saveFile(filePath: String, fileName: String) {
         val context = applicationContext ?: throw Exception("Application context is null")
         val originalFile = File(filePath)
         if (!originalFile.exists()) throw Exception("$filePath does not exist")
-        val fileUri = generateUri(originalFile.extension)
+        val fileUri = generateUri(fileName, originalFile.extension)
             ?: throw Exception("Failed to generate file URI")
         FileInputStream(originalFile).use { fileInputStream ->
             context.contentResolver.openOutputStream(fileUri)?.use { outputStream ->
@@ -109,8 +112,7 @@ class FlutterImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun generateUri(extension: String = ""): Uri? {
-        val fileName = "${System.currentTimeMillis()}"
+    private fun generateUri(fileName: String,extension: String = ""): Uri? {
         val mimeType = getMIMEType(extension)
         val isVideo = mimeType?.startsWith("video") == true
 
