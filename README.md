@@ -36,9 +36,21 @@ import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'dart:typed_data';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 
+// save image bytes to the gallery
 Future<void> saveImageExample(Uint8List imageBytes) async {
   try {
+    // by default, the file name is used as DateTime.now().millisecondsSinceEpoch.toString()
     await FlutterImageGallerySaver.saveImage(imageBytes);
+    print('Image saved successfully!');
+  } catch (e) {
+    print('Error saving image: $e');
+  }
+}
+
+// save image bytes to the gallery with a custom name (without extension)
+Future<void> saveImageExampleWithName(Uint8List imageBytes, String name) async {
+  try {
+    await FlutterImageGallerySaver.saveImage(imageBytes, name);
     print('Image saved successfully!');
   } catch (e) {
     print('Error saving image: $e');
@@ -51,9 +63,21 @@ Future<void> saveImageExample(Uint8List imageBytes) async {
 ```dart
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 
+// save a file from a given file path to the gallery
 Future<void> saveFileExample(String filePath) async {
   try {
+    // by default, the file name is used as the file name
     await FlutterImageGallerySaver.saveFile(filePath);
+    print('File saved successfully!');
+  } catch (e) {
+    print('Error saving file: $e');
+  }
+}
+
+// save a file from a given file path to the gallery with a custom name
+Future<void> saveFileExampleWithName(String filePath, String name) async {
+  try {
+    await FlutterImageGallerySaver.saveFile(filePath, name);
     print('File saved successfully!');
   } catch (e) {
     print('Error saving file: $e');
